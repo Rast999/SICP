@@ -1,6 +1,6 @@
 #lang racket
-(require racket/include)
-(include "lists.rkt")
+;(require racket/include)
+;(include "lists.rkt")
 
 
 ; ############# Helpers #############
@@ -94,6 +94,30 @@
                                          ((pair? x) (count-leaves-r x))
                                          (else 1))) t)))
 
+; Ex. 2.36
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      nil
+      (cons (accumulate op init (map car seqs))
+            (accumulate-n op init (map cdr seqs)))))
+
+; Ex. 2.36
+; Operations with matrixes and vectors
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+
+(define (matrix-*-vector m v)
+  (map (lambda (row) (accumulate + 0 (map * row v))) m))
+
+(define (transpose m)
+  (accumulate-n cons nil m))
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (row)
+           (map (lambda (col)
+                  (accumulate + 0
+                              (map * row col))) cols)) m)))
 ; ############# Testing #############
 (filter even? (map fib (enumerate-interval 0 20)))
 (even-fibs 20)
@@ -128,4 +152,24 @@
 (count-leaves (list 1 2 3 4 (list 5 6)))
 (displayln "testing 2.35 without enumerate-tree")
 (count-leaves-r (list 1 2 (list 3 4) (list 5 (list 6 7))))
-(count-leaves-r (list 1 2 3 4 (list 5 6))))
+(count-leaves-r (list 1 2 3 4 (list 5 6)))
+
+(displayln "testing 2.36")
+(define s (list (list 1 2 3) (list 4 5 6) (list 7 8 9) (list 10 11 12)))
+(define s2 (list (list 1 2) (list 3 4) (list 5 6)))
+(accumulate-n + 0 s)
+(accumulate-n * 1 s2)
+
+(displayln "testing 2.37")
+(dot-product (list 1 2 3) (list 4 5 6))
+(matrix-*-vector (list (list 1 4 7) (list 2 5 8) (list 3 6 9))
+                 (list 1 2 3))
+(transpose (list (list 1 2 3)
+                 (list 4 5 6)
+                 (list 7 8 9)))
+(matrix-*-matrix (list (list 1 2 3)
+                       (list 4 5 6)
+                       (list 7 8 9))
+                 (list (list 1 2 3)
+                       (list 3 4 5)
+                       (list 5 6 7)))
