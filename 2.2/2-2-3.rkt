@@ -107,7 +107,7 @@
   (accumulate + 0 (map * v w)))
 
 (define (matrix-*-vector m v)
-  (map (lambda (row) (accumulate + 0 (map * row v))) m))
+  (map (lambda (row) (dot-product row v)) m))
 
 (define (transpose m)
   (accumulate-n cons nil m))
@@ -116,8 +116,7 @@
   (let ((cols (transpose n)))
     (map (lambda (row)
            (map (lambda (col)
-                  (accumulate + 0
-                              (map * row col))) cols)) m)))
+                  (dot-product row col)) cols)) m)))
 ; ############# Testing #############
 (filter even? (map fib (enumerate-interval 0 20)))
 (even-fibs 20)
