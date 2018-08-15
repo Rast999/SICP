@@ -94,22 +94,20 @@
         (branch-structure b)
         (+ (calculate-branch (left-branch (branch-structure b)))
            (calculate-branch (right-branch (branch-structure b))))))
-  (+ (calculate-branch (left-branch m))
-     (calculate-branch (right-branch m))))
+  (if (not (pair? m))
+      m
+      (+ (calculate-branch (left-branch m))
+         (calculate-branch (right-branch m)))))
 
 ; Ex. 2.29 (c)
 ; Detect if the mobile is balanced.
 ; If the length * weight is equal for both branches and all the subsequent branches are balanced
 (define (balanced? m)
-  (define (calc-weight b)
-    (if (not (pair? (branch-structure b)))
-        (branch-structure b)
-        (total-weight (branch-structure b))))
   (cond ((not (pair? m)) #t)
         (else
          (let ((left (left-branch m))
                (right (right-branch m)))
-           (if (and (= (* (calc-weight left) (branch-length left)) (* (calc-weight right) (branch-length right)))
+           (if (and (= (* (total-weight (branch-structure left)) (branch-length left)) (* (total-weight (branch-structure right)) (branch-length right)))
                     (balanced? (branch-structure left))
                     (balanced? (branch-structure right)))
                #t
@@ -176,5 +174,5 @@
 
 (define mobtest (make-mobile (make-branch 2 1)
                              (make-branch 2 (make-mobile (make-branch 1 0.5)
-                                                         (make-branch 1 0.5)))))
+                                                         (make-branch 1 0.6)))))
 (balanced? mobtest)
