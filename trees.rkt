@@ -12,7 +12,7 @@
         (else (+ (count-leaves (car items))
                  (count-leaves (cdr items))))))
 
-; Ex. 2.27
+; Ex. 2.27``y
 (define (deep-reverse items)
   (cond ((null? items) nil)
         ((not (pair? items)) items)
@@ -97,6 +97,26 @@
   (+ (calculate-branch (left-branch m))
      (calculate-branch (right-branch m))))
 
+; Ex. 2.29 (c)
+; Detect if the mobile is balanced.
+; If the length * weight is equal for both branches and all the subsequent branches are balanced
+(define (balanced? m)
+  (define (calc-weight b)
+    (if (not (pair? (branch-structure b)))
+        (branch-structure b)
+        (total-weight (branch-structure b))))
+  (cond ((not (pair? m)) #t)
+        (else
+         (let ((left (left-branch m))
+               (right (right-branch m)))
+           (if (and (= (* (calc-weight left) (branch-length left)) (* (calc-weight right) (branch-length right)))
+                    (balanced? (branch-structure left))
+                    (balanced? (branch-structure right)))
+               #t
+               #f)))))
+
+
+
 ;(define mobile (make-mobile (make-branch 10 1)
 ;                            (make-branch 5 (make-mobile (make-branch 10 3)
 ;                                                        (make-branch 10 4)))))
@@ -136,8 +156,8 @@
 ;(define z2 (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
 ;(car (cdr (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr z2))))))))))))
 
-(define x (list 1 2 3))
-(define y (list 4 5 6))
+;(define x (list 1 2 3))
+;(define y (list 4 5 6))
 ;(deep-reverse x)
 ;(deep-reverse2 x)
 ;(deep-reverse (list x y))
@@ -147,9 +167,14 @@
 ;(define mob (make-mobile 10 20))
 ;(left-branch mob)
 ;(right-branch mob)
-(define mobile (make-mobile (make-branch 10 (make-mobile (make-branch 6 5)
-                                                         (make-branch 5 (make-mobile (make-branch 5 5)
-                                                                                     (make-branch 5 5)))))
-                            (make-branch 5 (make-mobile (make-branch 10 3)
-                                                        (make-branch 10 4)))))
-(total-weight mobile)
+;(define mobile (make-mobile (make-branch 10 (make-mobile (make-branch 6 5)
+;                                                         (make-branch 5 (make-mobile (make-branch 5 5)
+;                                                                                     (make-branch 5 5)))))
+;                            (make-branch 5 (make-mobile (make-branch 10 3)
+;                                                        (make-branch 10 4)))))
+;(total-weight mobile)
+
+(define mobtest (make-mobile (make-branch 2 1)
+                             (make-branch 2 (make-mobile (make-branch 1 0.5)
+                                                         (make-branch 1 0.5)))))
+(balanced? mobtest)
