@@ -1,4 +1,6 @@
 #lang racket
+(require racket/include)
+(include "lists.rkt")
 
 
 ; ############# Helpers #############
@@ -13,9 +15,11 @@
       b
       (fib-iter (+ a b) a (- count 1))))
 
+(define (square x) (* x x))
+
 ; ############# Implementation #############
 
-(define (even-fibs n)
+(define (even-fibs~ n)
   (define (next k)
     (if (> k n)
         nil
@@ -25,6 +29,103 @@
               (next (+ k 1))))))
   (next 0))
 
-; ############# Testing #############
+; Examples from page 121
 
-(even-fibs 10)
+(define (filter predicate seq)
+  (cond ((null? seq) nil)
+        ((predicate (car seq))
+         (cons (car seq)
+               (filter predicate (cdr seq))))
+        (else (filter predicate (cdr seq)))))
+
+(define (accumulate op initial seq)
+  (if (null? seq)
+      initial
+      (op (car seq)
+          (accumulate op initial (cdr seq)))))
+
+(define (enumerate-interval low high)
+  (if (> low high)
+      nil
+      (cons low (enumerate-interval (+ low 1) high))))
+
+(define (enumerate-tree tree)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) (list tree))
+        (else (append (enumerate-tree (car tree))
+                      (enumerate-tree (cdr tree))))))
+
+(define (sum-odd-squares tree)
+  (accumulate +
+              0
+              (map square
+                   (filter odd?
+                           (enumerate-tree tree)))))
+
+(define (even-fibs n)
+  (accumulate cons
+              nil
+              (filter even?
+                      (map fib
+                           (enumerate-interval 0 n)))))
+
+; Ex. 2.33
+(define (map2 p sequence)
+  (accumulate (lambda (x y) (cons (p x) y)) nil sequence))
+
+(define (append seq1 seq2)
+  (accumulate cons seq2 seq1))
+
+(define (length seq)
+  (accumulate (lambda (x y) (+ 1 y)) 0 seq))
+
+; Ex. 2.34
+(define (horner-eval x coefficient-sequence)
+  (accumulate (lambda (this-coef higher-terms) (+ this-coef (* x higher-terms)))
+              0
+              coefficient-sequence))
+
+; Ex. 2.35
+(define (count-leaves t)
+  (accumulate + 0 (map (lambda (x) 1) (enumerate-tree t))))
+
+(define (count-leaves-r t)
+  (accumulate + 0 (map (lambda (x) (cond ((null? x) 0)
+                                         ((pair? x) (count-leaves-r x))
+                                         (else 1))) t)))
+
+; ############# Testing #############
+(filter even? (map fib (enumerate-interval 0 20)))
+(even-fibs 20)
+
+(map square (filter even? (list 1 2 3 4 5 6 7 8 9)))
+
+(accumulate * 1 (list 1 2 3 4 5 6 7 8 9 10))
+
+(accumulate * 1 (map square (filter even? (list 1 2 3 4 5 6 7 8))))
+
+(sum-odd-squares (list (list 1 2 (list 3 4)) (list 5 (list 6 7) (list 8))))
+
+(displayln "testing map ex 2.33")
+(map2 square (list 1 2 3 4 5 6))
+(map2 fib (list 1 2 3 4 5))
+
+(displayln "testing append from 2.33")
+(append (list 1 2 3 4 5) (list 6 7 8 9))
+(append (list 1 2 3) (list 1 (list 2 3)))
+
+(displayln "testing length from 2.33")
+(length (list 1 2 3 4 5))
+(length '())
+(length (list 1 2 3 4 5 6 7 8 9 10))
+
+(displayln "testing ex 2.34")
+(horner-eval 2 (list 1 3 0 5 0 1))
+(horner-eval 3 (list -1 1 3 2))
+
+(displayln "testing ex 2.35")
+(count-leaves (list 1 2 (list 3 4) (list 5 (list 6 7))))
+(count-leaves (list 1 2 3 4 (list 5 6)))
+(displayln "testing 2.35 without enumerate-tree")
+(count-leaves-r (list 1 2 (list 3 4) (list 5 (list 6 7))))
+(count-leaves-r (list 1 2 3 4 (list 5 6))))
