@@ -5,11 +5,6 @@
 ; ############# Helpers #############
 (define (square x) (* x x))
 
-(define (map f items)
-  (if (null? items)
-      '()
-      (cons (f (car items)) (map f (cdr items)))))
-
 ; ############# Implementation #############
 (define (scale-tree tree factor)
   (map (lambda (sub-tree)
@@ -45,6 +40,14 @@
 (define (square-tree-m tree)
   (tree-map square tree))
 
+
+; Ex. 2.32
+(define (subsets s)
+  (if (null? s)
+      (list '())
+      (let ((rest (subsets (cdr s))))
+        (append rest (map (lambda (x) (cons (car s) x)) rest)))))
+
 ; ############# TEST #############
 ; Defining some test trees
 (define tree1 (list (list 1 2) (list 3 4 (list 5 6))))
@@ -79,3 +82,9 @@
 (square-tree-m tree2)
 (square-tree-m tree3)
 (square-tree-m nul-tree)
+
+(display "Testing 2.32")
+(newline)
+(subsets (list 1 2 3))
+(subsets (list 1 2 3 4))
+(subsets (list 1 2 (list 4 5)))
