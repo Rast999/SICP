@@ -101,7 +101,7 @@
       (cons (accumulate op init (map car seqs))
             (accumulate-n op init (map cdr seqs)))))
 
-; Ex. 2.36
+; Ex. 2.37
 ; Operations with matrixes and vectors
 (define (dot-product v w)
   (accumulate + 0 (map * v w)))
