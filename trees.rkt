@@ -70,23 +70,23 @@
 ; Ex. 2.29
 ; Mobile structure (cons @left-branch (cons @right-branch '()))
 (define (make-mobile left right)
-  (list left right))
+  (cons left right))
 
 (define (left-branch m)
   (car m))
 
 (define (right-branch m)
-  (car (cdr m)))
+  (cdr m))
 
 ; Branch structure
 (define (make-branch length structure)
-  (list length structure))
+  (cons length structure))
 
 (define (branch-length b)
   (car b))
 
 (define (branch-structure b)
-  (car (cdr b)))
+  (cdr b))
 
 (define (total-weight m)
   (define (calculate-branch b)
@@ -174,5 +174,6 @@
 
 (define mobtest (make-mobile (make-branch 2 1)
                              (make-branch 2 (make-mobile (make-branch 1 0.5)
-                                                         (make-branch 1 0.6)))))
+                                                         (make-branch 1 0.5)))))
 (balanced? mobtest)
+(total-weight mobtest)
