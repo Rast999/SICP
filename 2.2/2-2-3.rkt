@@ -117,7 +117,22 @@
     (map (lambda (row)
            (map (lambda (col)
                   (dot-product row col)) cols)) m)))
+
+; Ex. 2.38
+(define (fold-right op init sequence)
+  (accumulate op init sequence))
+
+(define (fold-left op init sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter init sequence))
+
+
 ; ############# Testing #############
+
 (filter even? (map fib (enumerate-interval 0 20)))
 (even-fibs 20)
 
@@ -172,3 +187,14 @@
                  (list (list 1 2 3)
                        (list 3 4 5)
                        (list 5 6 7)))
+
+(displayln "Testing 2.38")
+(fold-right / 1 (list 1 2 3))
+(fold-left / 1 (list 1 2 3))
+(fold-right list nil (list 1 2 3))
+(fold-left list nil (list 1 2 3))
+(displayln "To give the same results for accumulate and fold-left, the op should be commutative")
+(fold-right + 0 (list 1 2 3))
+(fold-left + 0 (list 1 2 3))
+(fold-right * 1 (list 1 2 3))
+(fold-left * 1 (list 1 2 3))
