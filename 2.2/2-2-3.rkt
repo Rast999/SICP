@@ -1,5 +1,6 @@
 #lang racket
-;(require racket/include)
+(require racket/include)
+(require math/number-theory)
 ;(include "lists.rkt")
 
 
@@ -16,6 +17,15 @@
       (fib-iter (+ a b) a (- count 1))))
 
 (define (square x) (* x x))
+
+(define (flatmap proc sequence)
+  (accumulate append nil (map proc sequence)))
+
+(define (prime-sum? pair)
+  (prime? (+ (car pair) (cadr pair))))
+
+(define (make-pair-sum pair)
+  (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
 
 ; ############# Implementation #############
 
@@ -130,6 +140,32 @@
               (cdr rest))))
   (iter init sequence))
 
+; Ex. 2.39 (reverse)
+(define (reverse-r sequence)
+  (fold-right (lambda (x y) (append y (list x))) nil sequence))
+
+(define (reverse-l sequence)
+  (fold-left (lambda (x y) (cons y x)) nil sequence))
+
+; Example from page 128
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter prime-sum?
+               (flatmap
+                (lambda (i)
+                  (map (lambda (j) (list i j))
+                       (enumerate-interval 1 (- i 1))))
+                (enumerate-interval 1 n)))))
+
+; Example page 129
+(define (permutations s)
+  (if (null? s)
+      (list nil)
+      (flatmap (lambda (x)
+                 (map (lambda (p) (cons x p))
+                      (permutations (remove x s))))
+               s)))
+
 
 ; ############# Testing #############
 
@@ -198,3 +234,10 @@
 (fold-left + 0 (list 1 2 3))
 (fold-right * 1 (list 1 2 3))
 (fold-left * 1 (list 1 2 3))
+
+(displayln "Testing reverse function from 2.39")
+(reverse-r (list 1 2 3))
+(reverse-l (list 1 2 3))
+
+(displayln "Testing permutations")
+(permutations (list 1 2 3))
