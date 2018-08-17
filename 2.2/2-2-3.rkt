@@ -27,6 +27,8 @@
 (define (make-pair-sum pair)
   (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
 
+(define (last seq)
+  (list-ref seq (- (length seq) 1)))
 ; ############# Implementation #############
 
 (define (even-fibs~ n)
@@ -151,11 +153,7 @@
 (define (prime-sum-pairs n)
   (map make-pair-sum
        (filter prime-sum?
-               (flatmap
-                (lambda (i)
-                  (map (lambda (j) (list i j))
-                       (enumerate-interval 1 (- i 1))))
-                (enumerate-interval 1 n)))))
+               (unique-pairs n))))
 
 ; Example page 129
 (define (permutations s)
@@ -166,6 +164,79 @@
                       (permutations (remove x s))))
                s)))
 
+
+; Ex. 2.40
+
+(define (unique-pairs n)
+  (flatmap (lambda (i)
+             (map (lambda (j) (list i j))
+                  (enumerate-interval 1 (- i 1))))
+           (enumerate-interval 1 n)))
+
+; Ex. 2.41
+
+(define (sum-triplets n s)
+  (filter (lambda (triplet)
+            (= (accumulate + 0 triplet)
+               s))
+          (flatmap (lambda (i)
+                     (flatmap (lambda (j)
+                                (map (lambda (k) (list i j k))
+                                     (enumerate-interval 1 (- j 1))))
+                              (enumerate-interval 1 (- i 1))))
+                   (enumerate-interval 3 n))))
+
+; Ex. 2.42
+
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter (lambda (positions) (safe? k positions))
+                (flatmap
+                 (lambda (rest-of-queens)
+                   (map (lambda (new-row)
+                          (adjoin-position new-row k rest-of-queens))
+                        (enumerate-interval 1 board-size)))
+                 (queen-cols (- k 1))))))
+  (queen-cols board-size))
+
+(define empty-board '())
+
+; append the queen to the previous ones
+(define (adjoin-position new-row k rest-of-queens)
+  (append rest-of-queens (list new-row)))
+
+; is the last positioned queen safe on it's place?
+(define (safe2? k positions)
+  (let ((current (last positions)))
+    (define (iter item rest count)
+      (cond ((= count k) #t)
+            ((or (= current item)
+                 (= (abs (- current item)) (- k count)))
+             #f)
+            (else (iter (car rest) (cdr rest) (+ count 1)))))
+    (iter (car positions) (cdr positions) 1)))
+
+(define (safe? k positions)
+  (let ((lastrow (last positions))
+        (lastcol k))
+    (null? (filter (lambda (row-col)
+                     (and (not (= lastcol (get-col row-col)))
+                          (or (= lastrow (get-row row-col))
+                              (= (/ (abs (- lastrow (get-row row-col)))
+                                    (abs (- lastcol (get-col row-col)))) 1))))
+                   (map make-row-col
+                        positions (enumerate-interval 1 k))))))
+
+(define (make-row-col row col)
+  (list row col))
+
+(define (get-row row-col)
+  (car row-col))
+
+(define (get-col row-col)
+  (cadr row-col))
 
 ; ############# Testing #############
 
@@ -239,5 +310,15 @@
 (reverse-r (list 1 2 3))
 (reverse-l (list 1 2 3))
 
+(displayln "testing  2.40")
+(prime-sum-pairs 6)
+
 (displayln "Testing permutations")
 (permutations (list 1 2 3))
+
+(displayln "Testing ex. 2.41")
+(sum-triplets 6 11)
+
+(displayln "Testing the queens problem 2.42")
+(queens 10)
+(safe2? 8 (list 8 4 1 3 6 2 7 7))
