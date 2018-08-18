@@ -4,58 +4,58 @@
 
 ; The wave painter.
 (define wave-segments
- (list
-  (make-segment
-   (make-vect 0.006 0.840)
-   (make-vect 0.155 0.591))
-  (make-segment
-   (make-vect 0.006 0.635)
-   (make-vect 0.155 0.392))
-  (make-segment
-   (make-vect 0.304 0.646)
-   (make-vect 0.155 0.591))
-  (make-segment
-   (make-vect 0.298 0.591)
-   (make-vect 0.155 0.392))
-  (make-segment
-   (make-vect 0.304 0.646)
-   (make-vect 0.403 0.646))
-  (make-segment
-   (make-vect 0.298 0.591)
-   (make-vect 0.354 0.492))
-  (make-segment
-   (make-vect 0.403 0.646)
-   (make-vect 0.348 0.845))
-  (make-segment
-   (make-vect 0.354 0.492)
-   (make-vect 0.249 0.000))
-  (make-segment
-   (make-vect 0.403 0.000)
-   (make-vect 0.502 0.293))
-  (make-segment
-   (make-vect 0.502 0.293)
-   (make-vect 0.602 0.000))
-  (make-segment
-   (make-vect 0.348 0.845)
-   (make-vect 0.403 0.999))
-  (make-segment
-   (make-vect 0.602 0.999)
-   (make-vect 0.652 0.845))
-  (make-segment
-   (make-vect 0.652 0.845)
-   (make-vect 0.602 0.646))
-  (make-segment
-   (make-vect 0.602 0.646)
-   (make-vect 0.751 0.646))
-  (make-segment
-   (make-vect 0.751 0.646)
-   (make-vect 0.999 0.343))
-  (make-segment
-   (make-vect 0.751 0.000)
-   (make-vect 0.597 0.442))
-  (make-segment
-   (make-vect 0.597 0.442)
-   (make-vect 0.999 0.144))))
+  (list
+   (make-segment
+    (make-vect 0.006 0.840)
+    (make-vect 0.155 0.591))
+   (make-segment
+    (make-vect 0.006 0.635)
+    (make-vect 0.155 0.392))
+   (make-segment
+    (make-vect 0.304 0.646)
+    (make-vect 0.155 0.591))
+   (make-segment
+    (make-vect 0.298 0.591)
+    (make-vect 0.155 0.392))
+   (make-segment
+    (make-vect 0.304 0.646)
+    (make-vect 0.403 0.646))
+   (make-segment
+    (make-vect 0.298 0.591)
+    (make-vect 0.354 0.492))
+   (make-segment
+    (make-vect 0.403 0.646)
+    (make-vect 0.348 0.845))
+   (make-segment
+    (make-vect 0.354 0.492)
+    (make-vect 0.249 0.000))
+   (make-segment
+    (make-vect 0.403 0.000)
+    (make-vect 0.502 0.293))
+   (make-segment
+    (make-vect 0.502 0.293)
+    (make-vect 0.602 0.000))
+   (make-segment
+    (make-vect 0.348 0.845)
+    (make-vect 0.403 0.999))
+   (make-segment
+    (make-vect 0.602 0.999)
+    (make-vect 0.652 0.845))
+   (make-segment
+    (make-vect 0.652 0.845)
+    (make-vect 0.602 0.646))
+   (make-segment
+    (make-vect 0.602 0.646)
+    (make-vect 0.751 0.646))
+   (make-segment
+    (make-vect 0.751 0.646)
+    (make-vect 0.999 0.343))
+   (make-segment
+    (make-vect 0.751 0.000)
+    (make-vect 0.597 0.442))
+   (make-segment
+    (make-vect 0.597 0.442)
+    (make-vect 0.999 0.144))))
 
 (define dog (load-painter "dog.jpg"))
 (define wave (segments->painter wave-segments))
@@ -75,7 +75,14 @@
       painter
       (let ((small (up-split painter (- n 1))))
         (below painter
-                (beside small small)))))
+               (beside small small)))))
+
+(define (split op1 op2)
+  (lambda (painter n)
+    (if (= n 0)
+        painter
+        (let ((small ((split op1 op2) painter (- n 1))))
+          (op1 painter (op2 small small))))))
 
 (define (corner-split painter n)
   (if (= n 0)
@@ -92,3 +99,19 @@
   (let ((quarter (corner-split painter n)))
     (let ((half (beside (flip-horiz quarter) quarter)))
       (below (flip-vert half) half))))
+
+(define (square-of-four tl tr bl br)
+  (lambda (painter)
+    (let ((top (beside (tl painter) (tr painter)))
+          (bottom (beside (bl painter) (br painter))))
+      (below bottom top))))
+
+(define (flipped-pairs2 painter)
+  (let ((combine4 (square-of-four identity flip-vert
+                                  identity flip-vert)))
+    (combine4 painter)))
+
+(define (square-limit2 painter n)
+  (let ((combine4 (square-of-four flip-horiz identity
+                                  rotate180 flip-vert)))
+  (combine4 (corner-split painter n))))
