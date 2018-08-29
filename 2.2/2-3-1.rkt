@@ -218,7 +218,7 @@
 
 (displayln "testing deriv")
 (deriv '(x ** 2) 'x)
-(deriv '((x ** 3) + (x ** 2) + (x * 3)) 'x)
+(deriv '((x ** 3) + (x ** 2) + (x * 3) + 3) 'x)
 (newline)
 (deriv '((x * 3) * (y * 2) * (z * 5)) 'x)
 (deriv '(x + 3 * (x + y + 2)) 'x)
