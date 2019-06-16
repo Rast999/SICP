@@ -1,0 +1,21 @@
+#lang racket
+
+; New cons
+
+(define (cons x y)
+  (lambda (m)
+    (cond ((= m 0) x)
+          ((= m 1) y)
+          (else (error "Wrong argument")))))
+
+(define (car z) (z 0))
+(define (cdr z) (z 1))
+
+(define pair (cons 1 2))
+(define dpair (cons 1 (cons 2 (cons 3 4))))
+(car pair)
+(cdr pair)
+(car dpair)
+(car (cdr dpair))
+(car (cdr (cdr dpair)))
+(cdr (cdr (cdr dpair)))

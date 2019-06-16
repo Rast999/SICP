@@ -1,0 +1,56 @@
+#lang racket
+
+; EX 2.4
+(define (ex2_4)
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z) ; where z is the procedure returned by cons
+  (z (lambda (p q) p)))
+
+(define (cdr z) ; where z is the procedure returned by cons
+  (z (lambda (p q) q)))
+
+; Test
+(define pair (cons 1 2))
+(display (car pair))
+(newline)
+(display (cdr pair)))
+
+; Ex 2.5
+
+(define (cons x y)
+  (*
+   (expt 2 x)
+   (expt 3 y)))
+
+(define (count-occurences num target count)
+  (if (= (remainder num target) 0)
+      (count-occurences (/ num target) target (+ count 1))
+      count))
+
+(define (car z)
+  (count-occurences z 2 0))
+
+(define (cdr z)
+  (count-occurences z 3 0))
+
+(define pair (cons 26 90))
+(car pair)
+(cdr pair)
+(define pair2 (cons 300 256))
+(car pair2)
+(cdr pair2)
+
+; Ex 2.6
+
+(define zero (lambda (f) (lambda (x) x)))
+(define one (lambda (f) (lambda (x) (f x))))
+(define two (lambda (f) (lambda (x) (f (f x)))))
+
+(define (add-1 n)
+  (lambda (f) (lambda (x) (f ((n f) x)))))
+
+; generic add
+(define (add x y)
+  (lambda (f) (lambda (x) ((x f) ((y f)x)))))

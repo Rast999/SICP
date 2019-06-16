@@ -1,0 +1,109 @@
+#lang racket
+
+(define (square x)
+  (* x x))
+
+(define (average x y)
+  (/ (+ x y) 2.0))
+
+(define (make-segment start end)
+  (cons start end))
+
+(define (start-segment seg)
+  (car seg))
+
+(define (end-segment seg)
+  (cdr seg))
+
+(define (make-point x y)
+  (cons x y))
+
+(define (x-point p)
+  (car p))
+
+(define (y-point p)
+  (cdr p))
+
+(define (length-p p1 p2)
+  (sqrt
+   (+ (square (abs (-
+                    (x-point p1)
+                    (x-point p2))))
+      (square (abs (-
+                    (y-point p1)
+                    (y-point p2)))))))
+
+; Ex 2.3
+
+(define (make-rect-2 lb height width)
+  (cons lb (cons height width)))
+
+(define (get-height-2 rect)
+  (car (cdr rect)))
+
+(define (get-width-2 rect)
+  (cdr (cdr rect)))
+
+; second implementation for rectangles
+
+(define (make-rect lb lt rb)
+  (cons lb (cons lt rb)))
+
+(define (get-height rect)
+  (length-p
+   (car rect)
+   (car (cdr rect))))
+
+(define (get-width rect)
+  (length-p
+   (car (cdr rect))
+   (cdr (cdr rect))))
+
+(define (rect-perimeter rect)
+  (* 2
+     (+
+      (get-height rect)
+      (get-width rect))))
+
+(define (rect-area rect)
+  (*
+   (get-height rect)
+   (get-width rect)))
+
+(define (midpoint seg)
+  (make-point (average (x-point (start-segment seg))
+                         (x-point (end-segment seg)))
+                (average (y-point (start-segment seg))
+                         (y-point (end-segment seg)))))
+
+(define (midpoint-b seg)
+  (let ((x-start (x-point (start-segment seg)))
+        (y-start (y-point (start-segment seg)))
+        (x-end (x-point (end-segment seg)))
+        (y-end (y-point (end-segment seg))))
+    (make-point (average x-start x-end)
+                (average y-start y-end))))
+
+(define (print-point p)
+  (newline)
+  (display "(")
+  (display (x-point p))
+  (display ", ")
+  (display (y-point p))
+  (display ")"))
+
+(define seg1 (make-segment (make-point 1 1) (make-point 5 5)))
+(define seg2 (make-segment (make-point 2 1) (make-point 5 10)))
+(print-point (midpoint-b seg1))
+(print-point (midpoint-b seg2))
+(newline)
+(display "===========")
+(newline)
+(define p1 (make-point 0 0))
+(define p2 (make-point 0 5))
+(define p3 (make-point 10 5))
+(define p4 (make-point 0 0))
+(define rect1 (make-rect p1 p2 p3))
+(rect-perimeter rect1)
+(rect-area rect1)
+(length-p p1 p2)

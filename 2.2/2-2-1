@@ -1,0 +1,123 @@
+#lang racket
+
+; Ex 2.17
+(define (last-pair seq)
+  (let ((tail (cdr seq)))
+    (if (null? tail)
+        seq
+        (last-pair tail))))
+
+(define l1 (list 1 2 3 4 5 6))
+(define l2 (cons 1 (cons 2 (cons 3 (cons 4 '())))))
+(last-pair l1)
+
+; Ex 2.18
+
+(define (reverse seq)
+  (define (reverse-iter seq result)
+    (if (null? seq)
+        result
+        (reverse-iter (cdr seq) (cons (car seq) result))))
+  (reverse-iter seq '()))
+
+(reverse l1)
+(reverse l2)
+
+; Ex 2.19
+
+(define (cc amount coin-values)
+  (cond ((= amount 0) 1)
+        ((or (< amount 0) (no-more? coin-values)) 0)
+        (else
+         (+ (cc amount (except-first-denomination coin-values))
+            (cc (- amount (first-denomination coin-values)) coin-values)))))
+
+(define (no-more? seq)
+  (null? seq))
+
+(define (except-first-denomination seq)
+  (cdr seq))
+
+(define (first-denomination seq)
+  (car seq))
+
+
+(define us-coins (list 1 25 10 50 5))
+(define uk-coins (list 100 50 20 10 5 2 1 0.5))
+
+; Ex 2.20
+
+(define (same-parity f . s)
+  (define (parity-helper check-digit seq)
+    (cond ((null? seq) '())
+          ((= (remainder (car seq) 2) check-digit) (cons (car seq) (parity-helper check-digit (cdr seq))))
+          (else (parity-helper check-digit (cdr seq)))))
+  (cons f (parity-helper (remainder f 2) s)))
+
+(same-parity 1 2 3 4 5 6 7 8 9)
+(same-parity 2 3 4 5 6 7 8 9 10)
+
+; Ex 2.21
+
+(define nil '())
+
+(define (map proc items)
+  (if (null? items)
+      '()
+      (cons (proc (car items))
+            (map proc (cdr items)))))
+
+(define (square-list-1 items)
+  (if (null? items)
+      nil
+      (cons (expt (car items) 2)
+            (square-list-1 (cdr items)))))
+
+(square-list-1 (list 3 4 5 6 7))
+
+(define (square-list-2 items)
+  (map (lambda (x) (* x x)) items))
+
+(square-list-2 (list 3 4 5 6 7))
+
+; Ex 2.22
+; In this case it returns the reversed list because
+; each new answer (squared item) is cons-ed to the result of the previous calculations
+; so, sooner the item is encountered in the original list, later it will be placed in the result list.
+
+(define (square-list-3 items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons (expt (car things) 2)
+                    answer))))
+  (iter items nil))
+
+(square-list-3 (list 3 4 5 6 7))
+
+; Below implementation doesn't work because the first argument given to cons is not a number, but a list/pair
+; For ex: if the list is (1 2 3), on first iteration we will have (cons '() 1) - which is a list
+; On second iteration (cons (cons '() 1) 4)
+; And on third it will be (cons (cons (cons '() 1) 4) 9) which is also not what we wanted
+
+(define (square-list-4 items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons answer
+                    (expt (car things) 2)))))
+  (iter items nil))
+
+(square-list-4 (list 3 4 5 6 7))
+
+
+(define (for-each proc items)
+  (cond ((null? items) #true)
+        (else
+         (proc (car items))
+         (for-each proc (cdr items)))))
+
+(for-each (lambda (x) (newline) (display (expt x 2))) (list 2 3 4 5 6 7 8 9))
+
